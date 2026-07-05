@@ -39,7 +39,8 @@ If `brew install tenv` fails because `opentofu`, `terragrunt`, or `tfenv` is alr
 
 ## Getting started
 
-Pick a provider, open its README, then follow the README in the example you want to try.
+1. Install [tenv](./tenv.md) and ensure `terraform` runs via the tenv proxy (`which terraform`).
+2. Pick a provider, open its README, then follow the README in the example you want to try.
 
 Currently available:
 

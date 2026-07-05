@@ -15,9 +15,17 @@ Nothing else is included: no modules, remote state backend, or additional Azure 
 
 ## Prerequisites
 
-- [Terraform](https://developer.hashicorp.com/terraform/install) `>= 1.15.0` (latest stable: **1.15.7**)
+- [tenv](https://tofuutils.github.io/tenv/) for Terraform version management — see [tenv.md](../../tenv.md)
+- Terraform `>= 1.15.0` (pinned to **1.15.7** via `.terraform-version`)
 - [azurerm provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest) `~> 4.80` (latest: **4.80.0**)
 - [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) installed and logged in
+
+Install and select the pinned Terraform version:
+
+```bash
+tenv tf install    # reads .terraform-version
+terraform version  # should report 1.15.7
+```
 
 Authenticate with Azure before running Terraform:
 
