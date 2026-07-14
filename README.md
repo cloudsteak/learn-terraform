@@ -27,7 +27,7 @@ Projects are organized by cloud provider:
 | ----------------- | ------------------------------------------------------------------------------ |
 | [Azure](./azure/) | [101-basic](./azure/101-basic/), [201-modules](./azure/201-modules/), [301-remote-state](./azure/301-remote-state/), [351-modules-remote-state](./azure/351-modules-remote-state/) |
 | [AWS](./aws/)     | [101-basic](./aws/101-basic/), [201-modules](./aws/201-modules/), [301-remote-state](./aws/301-remote-state/), [351-modules-remote-state](./aws/351-modules-remote-state/) |
-| GCP               | _coming soon_                                                                  |
+| [GCP](./gcp/)     | [101-basic](./gcp/101-basic/), [201-modules](./gcp/201-modules/), [301-remote-state](./gcp/301-remote-state/), [351-modules-remote-state](./gcp/351-modules-remote-state/) |
 
 See each provider directory for a short overview and links to its examples.
 
@@ -52,3 +52,7 @@ Currently available:
 - [AWS — 201-modules](./aws/201-modules/README.md)
 - [AWS — 301-remote-state](./aws/301-remote-state/README.md)
 - [AWS — 351-modules-remote-state](./aws/351-modules-remote-state/README.md)
+- [GCP — 101-basic](./gcp/101-basic/README.md)
+- [GCP — 201-modules](./gcp/201-modules/README.md)
+- [GCP — 301-remote-state](./gcp/301-remote-state/README.md)
+- [GCP — 351-modules-remote-state](./gcp/351-modules-remote-state/README.md)
