@@ -25,7 +25,7 @@ Projects are organized by cloud provider:
 
 | Provider | Examples |
 |----------|----------|
-| [Azure](./azure/) | [basic](./azure/basic/) |
+| [Azure](./azure/) | [101-basic](./azure/101-basic/) |
 | AWS | _coming soon_ |
 | GCP | _coming soon_ |
 
@@ -44,4 +44,4 @@ If `brew install tenv` fails because `opentofu`, `terragrunt`, or `tfenv` is alr
 
 Currently available:
 
-- [Azure — basic](./azure/basic/README.md)
+- [Azure — 101-basic](./azure/101-basic/README.md)
