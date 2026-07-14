@@ -2,7 +2,7 @@
 
 A minimal **Terraform** configuration that creates a resource group through a local module and stores state in an Azure Storage account.
 
-This example combines [301-modules](../301-modules/) and [201-remote-state](../201-remote-state/). It uses Terraform's native remote state backend — not Terragrunt.
+This example combines [201-modules](../201-modules/) and [301-remote-state](../301-remote-state/). It uses Terraform's native remote state backend — not Terragrunt.
 
 ## Purpose
 
@@ -38,7 +38,7 @@ az login
 ## Project structure
 
 ```
-azure/302-modules-remote-state/
+azure/351-modules-remote-state/
 ├── backend.tf              # Remote state backend configuration
 ├── bootstrap-backend.sh    # Create backend storage (Bash)
 ├── bootstrap-backend.ps1   # Create backend storage (PowerShell)
@@ -72,7 +72,7 @@ azure/302-modules-remote-state/
 | Storage account | `terraform` + 9 random digits (for example `terraform342254543`) | Stores Terraform state blobs |
 | Blob container | `tfstate` | Container for the state file |
 
-State for this project is stored under the key `302-modules-remote-state.tfstate`.
+State for this project is stored under the key `351-modules-remote-state.tfstate`.
 
 ### By Terraform (workload)
 
@@ -103,20 +103,20 @@ Run one of the bootstrap scripts before `terraform init`:
 **Bash:**
 
 ```bash
-cd azure/302-modules-remote-state
+cd azure/351-modules-remote-state
 ./bootstrap-backend.sh
 ```
 
 **PowerShell:**
 
 ```powershell
-cd azure/302-modules-remote-state
+cd azure/351-modules-remote-state
 ./bootstrap-backend.ps1
 ```
 
 The script lists your Azure subscriptions, asks which one to use, generates a random storage account name like `terraform342254543`, updates `backend.tf`, and creates the backend resources.
 
-If you already bootstrapped [201-remote-state](../201-remote-state/) with the same `backend.tf` values, you can reuse that storage account. This example uses a separate state key so both projects can share the same container.
+If you already bootstrapped [301-remote-state](../301-remote-state/) with the same `backend.tf` values, you can reuse that storage account. This example uses a separate state key so both projects can share the same container.
 
 ### Step 2 — Run Terraform
 
@@ -169,6 +169,6 @@ The bootstrap scripts and Terraform use credentials from the Azure CLI by defaul
 
 ## Next steps
 
-- Compare with [301-modules](../301-modules/) to see the same module pattern with local state
+- Compare with [201-modules](../201-modules/) to see the same module pattern with local state
 - Use separate `key` values in `backend.tf` for other projects sharing the same storage container
 - Publish the module to a registry or Git repository

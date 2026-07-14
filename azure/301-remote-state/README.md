@@ -37,7 +37,7 @@ az login
 ## Project structure
 
 ```
-azure/201-remote-state/
+azure/301-remote-state/
 ├── backend.tf              # Remote state backend configuration
 ├── bootstrap-backend.sh    # Create backend storage (Bash)
 ├── bootstrap-backend.ps1   # Create backend storage (PowerShell)
@@ -104,14 +104,14 @@ Run one of the bootstrap scripts before `terraform init`. The script:
 **Bash:**
 
 ```bash
-cd azure/201-remote-state
+cd azure/301-remote-state
 ./bootstrap-backend.sh
 ```
 
 **PowerShell:**
 
 ```powershell
-cd azure/201-remote-state
+cd azure/301-remote-state
 ./bootstrap-backend.ps1
 ```
 

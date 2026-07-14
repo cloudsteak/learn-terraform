@@ -36,7 +36,7 @@ az login
 ## Project structure
 
 ```
-azure/301-modules/
+azure/201-modules/
 ├── providers.tf                 # Terraform version, provider requirements, and Azure provider
 ├── variables.tf                 # Root module input variables
 ├── main.tf                      # Module call
@@ -83,7 +83,7 @@ One Azure resource group, created by the local module:
 From this directory:
 
 ```bash
-cd azure/301-modules
+cd azure/201-modules
 
 terraform init
 terraform plan
@@ -126,4 +126,4 @@ Once you understand local modules, you can:
 - Add more resources to the module
 - Call the same module multiple times with different inputs
 - Publish the module to a registry or Git repository
-- Combine modules with remote state from [201-remote-state](../201-remote-state/)
+- Combine modules with remote state from [301-remote-state](../301-remote-state/)

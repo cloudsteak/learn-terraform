@@ -25,7 +25,7 @@ Projects are organized by cloud provider:
 
 | Provider          | Examples                                                                       |
 | ----------------- | ------------------------------------------------------------------------------ |
-| [Azure](./azure/) | [101-basic](./azure/101-basic/), [201-remote-state](./azure/201-remote-state/), [301-modules](./azure/301-modules/), [302-modules-remote-state](./azure/302-modules-remote-state/) |
+| [Azure](./azure/) | [101-basic](./azure/101-basic/), [201-modules](./azure/201-modules/), [301-remote-state](./azure/301-remote-state/), [351-modules-remote-state](./azure/351-modules-remote-state/) |
 | AWS               | _coming soon_                                                                  |
 | GCP               | _coming soon_                                                                  |
 
@@ -45,6 +45,6 @@ If `brew install tenv` fails because `opentofu`, `terragrunt`, or `tfenv` is alr
 Currently available:
 
 - [Azure — 101-basic](./azure/101-basic/README.md)
-- [Azure — 201-remote-state](./azure/201-remote-state/README.md)
-- [Azure — 301-modules](./azure/301-modules/README.md)
-- [Azure — 302-modules-remote-state](./azure/302-modules-remote-state/README.md)
+- [Azure — 201-modules](./azure/201-modules/README.md)
+- [Azure — 301-remote-state](./azure/301-remote-state/README.md)
+- [Azure — 351-modules-remote-state](./azure/351-modules-remote-state/README.md)
