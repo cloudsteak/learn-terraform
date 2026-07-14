@@ -17,3 +17,9 @@ Simple remote state with Terraform's native `azurerm` backend in `backend.tf`. B
 Simple local module usage with local state. A root module calls a reusable `resource-group` module.
 
 → [README](./301-modules/README.md)
+
+## [302-modules-remote-state](./302-modules-remote-state/)
+
+Simple local module usage with remote state in Azure Storage. Combines the module pattern from 301 with the backend setup from 201.
+
+→ [README](./302-modules-remote-state/README.md)
