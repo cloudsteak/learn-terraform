@@ -11,3 +11,9 @@ Minimal Terraform setup for Azure: one resource group and a standard project fil
 Simple remote state with Terraform's native `azurerm` backend in `backend.tf`. Bootstrap scripts create the Azure storage; use `terraform init`, not Terragrunt.
 
 → [README](./201-remote-state/README.md)
+
+## [301-modules](./301-modules/)
+
+Simple local module usage with local state. A root module calls a reusable `resource-group` module.
+
+→ [README](./301-modules/README.md)

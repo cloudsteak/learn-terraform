@@ -25,7 +25,7 @@ Projects are organized by cloud provider:
 
 | Provider          | Examples                                                                       |
 | ----------------- | ------------------------------------------------------------------------------ |
-| [Azure](./azure/) | [101-basic](./azure/101-basic/), [201-remote-state](./azure/201-remote-state/) |
+| [Azure](./azure/) | [101-basic](./azure/101-basic/), [201-remote-state](./azure/201-remote-state/), [301-modules](./azure/301-modules/) |
 | AWS               | _coming soon_                                                                  |
 | GCP               | _coming soon_                                                                  |
 
@@ -46,3 +46,4 @@ Currently available:
 
 - [Azure — 101-basic](./azure/101-basic/README.md)
 - [Azure — 201-remote-state](./azure/201-remote-state/README.md)
+- [Azure — 301-modules](./azure/301-modules/README.md)
