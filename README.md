@@ -23,11 +23,11 @@ Examples are grouped around common Terraform fundamentals:
 
 Projects are organized by cloud provider:
 
-| Provider | Examples |
-|----------|----------|
-| [Azure](./azure/) | [101-basic](./azure/101-basic/) |
-| AWS | _coming soon_ |
-| GCP | _coming soon_ |
+| Provider          | Examples                                                                       |
+| ----------------- | ------------------------------------------------------------------------------ |
+| [Azure](./azure/) | [101-basic](./azure/101-basic/), [201-remote-state](./azure/201-remote-state/) |
+| AWS               | _coming soon_                                                                  |
+| GCP               | _coming soon_                                                                  |
 
 See each provider directory for a short overview and links to its examples.
 
@@ -45,3 +45,4 @@ If `brew install tenv` fails because `opentofu`, `terragrunt`, or `tfenv` is alr
 Currently available:
 
 - [Azure — 101-basic](./azure/101-basic/README.md)
+- [Azure — 201-remote-state](./azure/201-remote-state/README.md)
