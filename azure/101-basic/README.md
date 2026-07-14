@@ -36,7 +36,7 @@ az login
 ## Project structure
 
 ```
-azure/basic/
+azure/101-basic/
 ├── providers.tf   # Terraform version, provider requirements, and Azure provider
 ├── variables.tf   # Input variables
 ├── main.tf        # Resource definitions
@@ -91,7 +91,7 @@ resource_group_name = "rg-my-example"
 From this directory:
 
 ```bash
-cd azure/basic
+cd azure/101-basic
 
 # Download the Azure provider
 terraform init

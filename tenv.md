@@ -478,10 +478,10 @@ You can keep `.tool-versions` for a while during transition, or replace entries 
 
 ## Example: this repository
 
-For the Azure basic example (`azure/basic/`), which requires Terraform `>= 1.15.0`:
+For the Azure basic example (`azure/101-basic/`), which requires Terraform `>= 1.15.0`:
 
 ```bash
-cd azure/basic
+cd azure/101-basic
 
 tenv tf install min-required   # installs lowest allowed version from providers.tf
 tenv tf use min-required --working-dir

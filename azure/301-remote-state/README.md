@@ -1,0 +1,176 @@
+# Azure Remote State Terraform
+
+A minimal **Terraform** configuration that stores state in an Azure Storage account. Bootstrap scripts create the backend storage in Azure; Terraform reads the backend settings directly from `backend.tf`.
+
+This example uses Terraform's native remote state backend. It is **not** a Terragrunt setup — there is no `terragrunt.hcl`, no generated backend config, and no `terragrunt` commands.
+
+## Purpose
+
+This example builds on [101-basic](../101-basic/). It shows:
+
+- How to configure the native Terraform `azurerm` remote state backend in `backend.tf`
+- How to bootstrap backend storage with Azure CLI scripts before running Terraform
+- How Terraform manages infrastructure when state is stored remotely
+
+The state backend (resource group, storage account, blob container) is created outside Terraform by the bootstrap scripts. Terraform itself only manages the sample workload resource group.
+
+## Prerequisites
+
+- [tenv](https://tofuutils.github.io/tenv/) for Terraform version management — see [tenv.md](../../tenv.md)
+- Terraform `>= 1.15.0` (pinned to **1.15.7** via `.terraform-version`)
+- [azurerm provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest) `~> 4.80`
+- [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) installed and logged in
+
+Install and select the pinned Terraform version:
+
+```bash
+tenv tf install    # reads .terraform-version
+terraform version  # should report 1.15.7
+```
+
+Authenticate with Azure before running the bootstrap scripts or Terraform:
+
+```bash
+az login
+```
+
+## Project structure
+
+```
+azure/301-remote-state/
+├── backend.tf              # Remote state backend configuration
+├── bootstrap-backend.sh    # Create backend storage (Bash)
+├── bootstrap-backend.ps1   # Create backend storage (PowerShell)
+├── providers.tf            # Terraform version, provider requirements, and Azure provider
+├── variables.tf            # Input variables
+├── main.tf                 # Sample workload resource
+├── outputs.tf              # Output values
+└── README.md               # This file
+```
+
+| File | Responsibility |
+|------|----------------|
+| `backend.tf` | Native Terraform `azurerm` backend settings |
+| `bootstrap-backend.sh` | Prompts for subscription, generates storage account name, updates `backend.tf` (Bash) |
+| `bootstrap-backend.ps1` | Prompts for subscription, generates storage account name, updates `backend.tf` (PowerShell) |
+| `providers.tf` | Pins Terraform and the `azurerm` provider |
+| `variables.tf` | Defines configurable inputs with defaults |
+| `main.tf` | Declares the sample workload resource group |
+| `outputs.tf` | Exposes useful values after apply |
+
+## What gets created
+
+### By bootstrap scripts (remote state backend)
+
+| Resource | Name (default) | Purpose |
+|----------|----------------|---------|
+| Resource group | `rg-learn-terraform-state` | Holds the remote state storage account |
+| Storage account | `terraform` + 9 random digits (for example `terraform342254543`) | Stores Terraform state blobs |
+| Blob container | `tfstate` | Container for the state file |
+
+The bootstrap scripts ask which Azure subscription to use, generate a random storage account name, update `storage_account_name` in `backend.tf`, and create the matching Azure resources.
+
+### By Terraform (workload)
+
+| Resource | Name (default) | Location (default) |
+|----------|----------------|--------------------|
+| Resource group | `rg-learn-terraform-workload` | `Sweden Central` |
+
+## Variables
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `location` | `string` | `Sweden Central` | Azure region for the workload resource group |
+| `resource_group_name` | `string` | `rg-learn-terraform-workload` | Name of the workload resource group |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| `resource_group_name` | Name of the workload resource group |
+| `resource_group_id` | Azure resource ID of the workload resource group |
+
+## Usage
+
+### Step 1 — Bootstrap the Azure storage backend
+
+Run one of the bootstrap scripts before `terraform init`. The script:
+
+1. Lists your Azure subscriptions and asks which one to use
+2. Generates a random storage account name like `terraform342254543`
+3. Updates `storage_account_name` in `backend.tf`
+4. Creates the resource group, storage account, and blob container
+
+**Bash:**
+
+```bash
+cd azure/301-remote-state
+./bootstrap-backend.sh
+```
+
+**PowerShell:**
+
+```powershell
+cd azure/301-remote-state
+./bootstrap-backend.ps1
+```
+
+Example prompt:
+
+```text
+Available Azure subscriptions:
+
+  1) Production
+     11111111-1111-1111-1111-111111111111
+
+  2) Sandbox
+     22222222-2222-2222-2222-222222222222
+
+Select subscription [1-2]: 2
+
+Generated storage account name: terraform342254543
+Updated storage_account_name in backend.tf
+```
+
+Other backend settings (`resource_group_name`, `container_name`, `key`) come from `backend.tf`. Only `storage_account_name` is generated by the bootstrap scripts.
+
+### Step 2 — Run Terraform
+
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+
+Use the `terraform` CLI directly — not `terragrunt`. Terraform stores its state in the Azure Storage account configured in `backend.tf`.
+
+### Cleanup
+
+Remove workload resources first:
+
+```bash
+terraform destroy
+```
+
+Then delete the backend storage manually:
+
+```bash
+az group delete --name rg-learn-terraform-state --yes --no-wait
+```
+
+Adjust the resource group name if you used a custom value in the bootstrap script.
+
+## Authentication
+
+The bootstrap scripts and Terraform use credentials from the Azure CLI by default. After `az login`, both the `azurerm` provider and backend use your active account.
+
+For CI/CD, use a service principal or managed identity with permissions on the state storage account. See [Azure backend authentication](https://developer.hashicorp.com/terraform/language/settings/backends/azurerm).
+
+## Next steps
+
+Once remote state works, you can:
+
+- Share the same backend settings across teammates or CI pipelines
+- Use separate `key` values per environment or project in the same container
+- Add blob versioning or locking for production setups
+- Move on to modules and environment-specific `.tfvars` files
