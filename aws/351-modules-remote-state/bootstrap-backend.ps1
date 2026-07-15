@@ -120,7 +120,6 @@ function Select-Profile {
 Select-Profile
 
 $region = Read-BackendValue "region"
-$dynamodbTable = Read-BackendValue "dynamodb_table"
 $stateKey = Read-BackendValue "key"
 $bucket = Read-BackendValue "bucket"
 
@@ -136,8 +135,8 @@ if (Test-BucketExists $bucket) {
 Write-Host "Terraform backend settings:"
 Write-Host "  Region:           $region"
 Write-Host "  State bucket:     $bucket"
-Write-Host "  DynamoDB table:   $dynamodbTable"
 Write-Host "  State key:        $stateKey"
+Write-Host "  Locking:          S3 lockfile (use_lockfile = true)"
 Write-Host ""
 
 if (-not (Test-BucketExists $bucket)) {
@@ -162,23 +161,6 @@ aws s3api put-bucket-encryption `
     --bucket $bucket `
     --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}' `
     --output none | Out-Null
-
-$existingTable = aws dynamodb describe-table --table-name $dynamodbTable --region $region 2>$null
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Creating DynamoDB lock table: $dynamodbTable"
-    aws dynamodb create-table `
-        --table-name $dynamodbTable `
-        --attribute-definitions AttributeName=LockID,AttributeType=S `
-        --key-schema AttributeName=LockID,KeyType=HASH `
-        --billing-mode PAY_PER_REQUEST `
-        --region $region `
-        --output none | Out-Null
-
-    Write-Host "Waiting for DynamoDB table to become active..."
-    aws dynamodb wait table-exists --table-name $dynamodbTable --region $region
-} else {
-    Write-Host "DynamoDB lock table already exists: $dynamodbTable"
-}
 
 Write-Host ""
 Write-Host "Remote state backend is ready for Terraform."

@@ -6,6 +6,12 @@ Minimal Terraform setup for AWS: one S3 bucket and a standard project file layou
 
 → [README](./101-basic/README.md)
 
+## [102-default-tags](./102-default-tags/)
+
+Provider-level `default_tags` applied automatically to every supported AWS resource.
+
+→ [README](./102-default-tags/README.md)
+
 ## [201-modules](./201-modules/)
 
 Simple local module usage with local state. A root module calls a reusable `s3-bucket` module.
@@ -14,7 +20,7 @@ Simple local module usage with local state. A root module calls a reusable `s3-b
 
 ## [301-remote-state](./301-remote-state/)
 
-Simple remote state with Terraform's native `s3` backend in `backend.tf`. Bootstrap scripts create the S3 bucket and DynamoDB lock table; use `terraform init`, not Terragrunt.
+Simple remote state with Terraform's native `s3` backend in `backend.tf`. Bootstrap scripts create the S3 state bucket; use `terraform init`, not Terragrunt.
 
 → [README](./301-remote-state/README.md)
 

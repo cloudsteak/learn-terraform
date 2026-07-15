@@ -120,6 +120,6 @@ For CI/CD, use IAM roles, OIDC, or access keys via environment variables. See [A
 Once you understand this layout, you can extend it by:
 
 - Adding more resources (for example bucket versioning or encryption)
-- Introducing a remote backend (for example S3 with DynamoDB locking)
+- Introducing a remote backend (for example S3 with S3 lockfile locking)
 - Splitting logic into modules
 - Using separate `.tfvars` files per environment

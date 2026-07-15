@@ -116,7 +116,6 @@ create_bucket() {
 select_profile
 
 REGION="$(read_backend_value region)"
-DYNAMODB_TABLE="$(read_backend_value dynamodb_table)"
 STATE_KEY="$(read_backend_value key)"
 BUCKET="$(read_backend_value bucket)"
 
@@ -132,8 +131,8 @@ fi
 echo "Terraform backend settings:"
 echo "  Region:           ${REGION}"
 echo "  State bucket:     ${BUCKET}"
-echo "  DynamoDB table:   ${DYNAMODB_TABLE}"
 echo "  State key:        ${STATE_KEY}"
+echo "  Locking:          S3 lockfile (use_lockfile = true)"
 echo
 
 if ! bucket_exists "${BUCKET}"; then
@@ -158,22 +157,6 @@ aws s3api put-bucket-encryption \
   --bucket "${BUCKET}" \
   --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}' \
   --output none
-
-if ! aws dynamodb describe-table --table-name "${DYNAMODB_TABLE}" --region "${REGION}" >/dev/null 2>&1; then
-  echo "Creating DynamoDB lock table: ${DYNAMODB_TABLE}"
-  aws dynamodb create-table \
-    --table-name "${DYNAMODB_TABLE}" \
-    --attribute-definitions AttributeName=LockID,AttributeType=S \
-    --key-schema AttributeName=LockID,KeyType=HASH \
-    --billing-mode PAY_PER_REQUEST \
-    --region "${REGION}" \
-    --output none
-
-  echo "Waiting for DynamoDB table to become active..."
-  aws dynamodb wait table-exists --table-name "${DYNAMODB_TABLE}" --region "${REGION}"
-else
-  echo "DynamoDB lock table already exists: ${DYNAMODB_TABLE}"
-fi
 
 echo
 echo "Remote state backend is ready for Terraform."
