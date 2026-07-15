@@ -4,6 +4,6 @@ terraform {
     key            = "351-modules-remote-state.tfstate"
     region         = "eu-north-1"
     encrypt        = true
-    dynamodb_table = "learn-terraform-state-lock"
+    use_lockfile   = true
   }
 }
