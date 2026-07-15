@@ -27,21 +27,6 @@ read_backend_value() {
   printf '%s' "${value}"
 }
 
-update_backend_bucket_name() {
-  local name="$1"
-  local tmp_file
-
-  tmp_file="$(mktemp)"
-  sed "s/bucket[[:space:]]*=.*/bucket         = \"${name}\"/" "${BACKEND_TF}" > "${tmp_file}"
-  mv "${tmp_file}" "${BACKEND_TF}"
-}
-
-generate_bucket_name() {
-  local account_id
-  account_id="$(aws sts get-caller-identity --query Account --output text)"
-  printf 'learn-terraform-state-%s-%09d' "${account_id}" "$((RANDOM * RANDOM % 900000000 + 100000000))"
-}
-
 select_profile() {
   local profiles
   local count
@@ -95,69 +80,36 @@ bucket_exists() {
   aws s3api head-bucket --bucket "${name}" >/dev/null 2>&1
 }
 
-create_bucket() {
-  local name="$1"
-  local region="$2"
-
-  if [[ "${region}" == "us-east-1" ]]; then
-    aws s3api create-bucket \
-      --bucket "${name}" \
-      --region "${region}" \
-      --output none
-  else
-    aws s3api create-bucket \
-      --bucket "${name}" \
-      --region "${region}" \
-      --create-bucket-configuration "LocationConstraint=${region}" \
-      --output none
-  fi
-}
-
 select_profile
 
 REGION="$(read_backend_value region)"
 STATE_KEY="$(read_backend_value key)"
 BUCKET="$(read_backend_value bucket)"
 
-if bucket_exists "${BUCKET}"; then
-  echo "Using existing state bucket from backend.tf: ${BUCKET}"
-else
-  BUCKET="$(generate_bucket_name)"
-  update_backend_bucket_name "${BUCKET}"
-  echo "Generated state bucket name: ${BUCKET}"
-  echo "Updated bucket in ${BACKEND_TF}"
-fi
-
-echo "Terraform backend settings:"
+echo "This will permanently delete the Terraform remote state backend:"
 echo "  Region:           ${REGION}"
 echo "  State bucket:     ${BUCKET}"
 echo "  State key:        ${STATE_KEY}"
 echo "  Locking:          S3 lockfile (use_lockfile = true)"
 echo
+echo "Run 'terraform destroy' in this directory before cleanup when possible."
+echo "The entire state bucket is removed, including state files and lock files."
+echo
 
-if ! bucket_exists "${BUCKET}"; then
-  echo "Creating state bucket: ${BUCKET}"
-  create_bucket "${BUCKET}" "${REGION}"
-else
-  echo "State bucket already exists: ${BUCKET}"
+read -rp "Type 'yes' to permanently delete these resources: " confirm
+if [[ "${confirm}" != "yes" ]]; then
+  echo "Cleanup cancelled."
+  exit 0
 fi
 
-aws s3api put-bucket-versioning \
-  --bucket "${BUCKET}" \
-  --versioning-configuration Status=Enabled \
-  --output none
+echo
 
-aws s3api put-public-access-block \
-  --bucket "${BUCKET}" \
-  --public-access-block-configuration \
-    BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true \
-  --output none
-
-aws s3api put-bucket-encryption \
-  --bucket "${BUCKET}" \
-  --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}' \
-  --output none
+if bucket_exists "${BUCKET}"; then
+  echo "Deleting state bucket: ${BUCKET}"
+  aws s3 rb "s3://${BUCKET}" --force
+else
+  echo "State bucket not found (already deleted): ${BUCKET}"
+fi
 
 echo
-echo "Remote state backend is ready for Terraform."
-echo "Next: terraform init && terraform apply"
+echo "Remote state backend cleanup complete."

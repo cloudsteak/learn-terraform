@@ -33,47 +33,6 @@ function Read-BackendValue {
     Write-Error "Could not parse '$Key' from $backendTf"
 }
 
-function Update-BackendBucketName {
-    param([string]$Name)
-
-    $content = Get-Content -Path $backendTf
-    $updated = $content -replace 'bucket\s*=.*', "bucket         = `"$Name`""
-    Set-Content -Path $backendTf -Value $updated -Encoding utf8NoBOM
-}
-
-function New-StateBucketName {
-    $accountId = aws sts get-caller-identity --query Account --output text
-    $suffix = Get-Random -Minimum 100000000 -Maximum 999999999
-    return "learn-terraform-state-$accountId-$suffix"
-}
-
-function Test-BucketExists {
-    param([string]$Name)
-
-    aws s3api head-bucket --bucket $Name 2>$null | Out-Null
-    return $LASTEXITCODE -eq 0
-}
-
-function New-StateBucket {
-    param(
-        [string]$Name,
-        [string]$Region
-    )
-
-    if ($Region -eq "us-east-1") {
-        aws s3api create-bucket `
-            --bucket $Name `
-            --region $Region `
-            --output none | Out-Null
-    } else {
-        aws s3api create-bucket `
-            --bucket $Name `
-            --region $Region `
-            --create-bucket-configuration "LocationConstraint=$Region" `
-            --output none | Out-Null
-    }
-}
-
 function Select-Profile {
     $profiles = @(aws configure list-profiles)
 
@@ -117,51 +76,43 @@ function Select-Profile {
     }
 }
 
+function Test-BucketExists {
+    param([string]$Name)
+
+    aws s3api head-bucket --bucket $Name 2>$null | Out-Null
+    return $LASTEXITCODE -eq 0
+}
+
 Select-Profile
 
 $region = Read-BackendValue "region"
 $stateKey = Read-BackendValue "key"
 $bucket = Read-BackendValue "bucket"
 
-if (Test-BucketExists $bucket) {
-    Write-Host "Using existing state bucket from backend.tf: $bucket"
-} else {
-    $bucket = New-StateBucketName
-    Update-BackendBucketName $bucket
-    Write-Host "Generated state bucket name: $bucket"
-    Write-Host "Updated bucket in $backendTf"
-}
-
-Write-Host "Terraform backend settings:"
+Write-Host "This will permanently delete the Terraform remote state backend:"
 Write-Host "  Region:           $region"
 Write-Host "  State bucket:     $bucket"
 Write-Host "  State key:        $stateKey"
 Write-Host "  Locking:          S3 lockfile (use_lockfile = true)"
 Write-Host ""
+Write-Host "Run 'terraform destroy' in this directory before cleanup when possible."
+Write-Host "The entire state bucket is removed, including state files and lock files."
+Write-Host ""
 
-if (-not (Test-BucketExists $bucket)) {
-    Write-Host "Creating state bucket: $bucket"
-    New-StateBucket -Name $bucket -Region $region
-} else {
-    Write-Host "State bucket already exists: $bucket"
+$confirm = Read-Host "Type 'yes' to permanently delete these resources"
+if ($confirm -ne "yes") {
+    Write-Host "Cleanup cancelled."
+    exit 0
 }
 
-aws s3api put-bucket-versioning `
-    --bucket $bucket `
-    --versioning-configuration Status=Enabled `
-    --output none | Out-Null
+Write-Host ""
 
-aws s3api put-public-access-block `
-    --bucket $bucket `
-    --public-access-block-configuration `
-        BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true `
-    --output none | Out-Null
-
-aws s3api put-bucket-encryption `
-    --bucket $bucket `
-    --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}' `
-    --output none | Out-Null
+if (Test-BucketExists $bucket) {
+    Write-Host "Deleting state bucket: $bucket"
+    aws s3 rb "s3://$bucket" --force | Out-Null
+} else {
+    Write-Host "State bucket not found (already deleted): $bucket"
+}
 
 Write-Host ""
-Write-Host "Remote state backend is ready for Terraform."
-Write-Host "Next: terraform init && terraform apply"
+Write-Host "Remote state backend cleanup complete."
