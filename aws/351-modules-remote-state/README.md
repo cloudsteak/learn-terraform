@@ -1,6 +1,6 @@
 # AWS Modules with Remote State
 
-A minimal **Terraform** configuration that creates an S3 bucket through a local module and stores state in an S3 bucket with DynamoDB locking.
+A minimal **Terraform** configuration that creates an S3 bucket through a local module and stores state in an S3 bucket with S3-native lockfile locking.
 
 This example combines [201-modules](../201-modules/) and [301-remote-state](../301-remote-state/). It uses Terraform's native remote state backend — not Terragrunt.
 
@@ -68,8 +68,7 @@ aws/351-modules-remote-state/
 
 | Resource | Name (default) | Purpose |
 |----------|----------------|---------|
-| S3 bucket | `learn-terraform-state-{account-id}-` + 9 random digits | Stores Terraform state objects |
-| DynamoDB table | `learn-terraform-state-lock` | State locking |
+| S3 bucket | `learn-terraform-state-{account-id}-` + 9 random digits | Stores Terraform state objects and lock files |
 
 State for this project is stored under the key `351-modules-remote-state.tfstate`.
 
@@ -138,8 +137,13 @@ terraform destroy
 Then delete the backend storage if you no longer need it:
 
 ```bash
+./cleanup-backend.sh
+```
+
+Or delete the bucket directly:
+
+```bash
 aws s3 rb s3://YOUR-STATE-BUCKET-NAME --force
-aws dynamodb delete-table --table-name learn-terraform-state-lock --region eu-north-1
 ```
 
 ## How the module is used
